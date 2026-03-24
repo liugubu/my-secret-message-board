@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>给我的专属留言板</title>
+    <!-- 引入图标库 -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        /* 背景装饰粒子 */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            animation: float 15s infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
+        }
+
+        /* 主容器 */
+        .container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        /* 卡片样式 */
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+            padding: 50px 40px;
+            animation: slideUp 0.8s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 头部 */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .avatar {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .title {
+            font-size: 36px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 16px;
+            font-weight: 300;
+        }
+
+        /* 表单样式 */
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .label {
+            display: block;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .input, .textarea, .select {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            font-size: 16px;
+            font-family: 'Noto Sans SC', sans-serif;
+            transition: all 0.3s;
+            background: #fafafa;
+        }
+
+        .input:focus, .textarea:focus, .select:focus {
+            outline: none;
+            border-color: #667eea;
+            background: #fff;
+            box-shadow: 0 0 0 5px rgba(102, 126, 234, 0.1);
+        }
+
+        .textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        /* 分类标签 */
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .tag {
+            padding: 10px 20px;
+            background: #f0f0f0;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+            color: #666;
+            border: 2px solid transparent;
+        }
+
+        .tag:hover {
+            background: #e0e0e0;
+            transform: translateY(-2px);
+        }
+
+        .tag.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        /* 提交按钮 */
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border: none;
+            border-radius: 15px;
+           G font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
+        }
+
+        .submit-btn:active {
+            transform: translateY(-1px);
+        }
+
+        /* 私密提示 */
+        .secret-note {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 15px;
+            border: 2px dashed #667eea;
+        }
+
+        .secret-note-icon {
+            font-size: 30px;
+            margin-bottom: 10px;
+        }
+
+        .secret-note-text {
+            color: #667eea;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        /* 响应式 */
+        @media (max-width: 600px) {
+            .card {
+                padding: 30px 20px;
+            }
+            .title {
+                font-size: 28px;
+            }
+            .avatar {
+                width: 100px;
+                height: 100px;
+                font-size: 50px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 背景粒子 -->
+    <div class="particles" id="particles"></div>
+
+    <div class="container">
+        <div class="card">
+            <!-- 头部 -->
+            <div class="header">
+                <div class="avatar">💌</div>
+                <h1 class="title">给我的专属留言</h1>
+                <p class="subtitle">写下你想说的话，只有我能看到</p>
+            </div>
+
+            <!-- 留言表单 -->
+            <form id="messageForm">
+                <!-- 分类选择 -->
+                <div class="form-group">
+                    <label class="label">选择分类</label>
+                    S<div class="tags" id="tags">
+                        <div class="tag active" data-tag="日常问候">日常问候</div>
+                        <div class="tag" data-tag="想说的话">想说的话</div>
+                        <div class="tag" data-tag="问题咨询">问题咨询</div>
+                        <div class="tag" data-tag="悄悄话">悄悄话</div>
+                        <div class="tag" data-tag="其他">其他</div>
+                    </div>
+                </div>
+
+                <!-- 昵称 -->
+                <div class="form-group">
+                    <label class="label">你的昵称（可选）</label>
+                    <input type="text" class="input" id="nickname" placeholder="想让我怎么称呼你？">
+                </div>
+
+                <!-- 留言内容 -->
+                <div class="form-group">
+                    <label class="label">留言内容</label>
+                    <textarea class="textarea" id="message" placeholder="在这里写下你想说的话..." required></textarea>
+                </div>
+
+                <!-- 提交按钮 -->
+                <button type="submit" class="submit-btn">发送留言 ✨</button>
+            </form>
+
+            <!-- 私密提示 -->
+            <div class="secret-note">
+                <div class="secret-note-icon">🔒</div>
+                <div class="secret-note-text">
+                    留言将通过私密方式发送，只有我能在后台看到，请放心留言
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // ⚠️ 重要：请把下面改成你自己的GitHub配置！
+        // ==========================================
+        const CONFIG = {
+            username: 'liugubu', // 比如：zhangsan
+            repo: 'my-secret-message-board'      // 比如：my-secret-message-board
+        };
+
+        // 生成背景粒子
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.width = Math.random() * 20 + 10 + 'px';
+                particle.style.height = particle.style.width;
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = Math.random() * 10 + 10 + 's';
+                container.appendChild(particle);
+            }
+        }
+
+        // 标签选择逻辑
+        let selectedTag = '日常问候';
+        document.querySelectorAll('.tag').forEach(tag => {
+            tag.addEventListener('click', () => {
+                document.querySelectorAll('.tag').forEach(t => t.classList.remove('active'));
+                tag.classList.add('active');
+                selectedTag = tag.dataset.tag;
+            });
+        });
+
+        // 表单提交逻辑
+        document.getElementById('messageForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const nickname = document.getElementById('nickname').value || '匿名访客';
+            const message = document.getElementById('message').value;
+
+            // 构建GitHub Issue标题和内容
+            const issueTitle = `[${selectedTag}] 来自 ${nickname} 的留言`;
+            const issueBody = `
+## 留言信息
+
+**分类：** ${selectedTag}
+**昵称：** ${nickname}
+**时间：** ${new Date().toLocaleString('zh-CN')}
+
+---
+
+## 留言内容
+
+${message}
+            `.trim();
+
+            // 跳转到GitHub Issue提交页面
+            const githubUrl = `https://github.com/${CONFIG.username}/${CONFIG.repo}/issues/new?title=${encodeURIComponent(issueTitle)}&body=${encodeURIComponent(issueBody)}`;
+            
+            // 打开新窗口提交
+            window.open(githubUrl, '_blank');
+            
+            // 提示用户
+            alert('正在跳转到私密提交页面...\n点击「Submit new issue」即可完成留言！');
+            
+            // 清空表单
+            document.getElementById('messageForm').reset();
+        });
+
+        // 初始化
+        createParticles();
+    </script>
+</body>
+</html>
